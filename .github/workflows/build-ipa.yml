@@ -6,6 +6,9 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: write   # to publish the .ipa as a release
+
 jobs:
   build:
     runs-on: macos-15
@@ -38,3 +41,10 @@ jobs:
         with:
           name: PadtasticReceiver-ipa
           path: PadtasticReceiver.ipa
+
+      - name: Publicar .ipa como Release (descarga directa)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Padtastic Receiver build ${{ github.run_number }}
+          files: PadtasticReceiver.ipa
