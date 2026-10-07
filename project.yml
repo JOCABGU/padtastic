@@ -1,0 +1,28 @@
+# XcodeGen spec (https://github.com/yonaskolb/XcodeGen). On a Mac:  brew install xcodegen && xcodegen generate
+# Then open PadtasticReceiver.xcodeproj, choose your Team under Signing and run on the iPhone.
+name: PadtasticReceiver
+options:
+  bundleIdPrefix: com.josufl
+  deploymentTarget:
+    iOS: "16.0"
+packages:
+  UltraAudioCore:
+    path: .
+targets:
+  PadtasticReceiver:
+    type: application
+    platform: iOS
+    sources: [App]
+    info:
+      path: App/Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.josufl.padtastic.receiver
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        INFOPLIST_FILE: App/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - package: UltraAudioCore
+        product: UltraAudioCore
+    scheme: {}   # shared scheme, needed by xcodebuild in CI

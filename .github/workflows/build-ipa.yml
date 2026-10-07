@@ -1,0 +1,40 @@
+# Builds the iPhone receiver on a GitHub-hosted Mac and publishes an UNSIGNED .ipa as an artifact.
+# Install it on your iPhone from Windows with Sideloadly or AltStore (they sign it with your Apple ID).
+name: Padtastic Receiver (iPhone)
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pruebas del núcleo (UltraAudioCore)
+        run: swift test
+
+      - name: Generar proyecto Xcode
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Compilar app (sin firmar)
+        run: |
+          xcodebuild -project PadtasticReceiver.xcodeproj -scheme PadtasticReceiver \
+            -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+
+      - name: Empaquetar .ipa
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/PadtasticReceiver.app Payload/
+          zip -qry PadtasticReceiver.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PadtasticReceiver-ipa
+          path: PadtasticReceiver.ipa
